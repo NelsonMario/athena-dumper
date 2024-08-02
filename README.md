@@ -1,6 +1,6 @@
 # athena-dumper
 
-Athena Dumper is a Python-based tool designed for efficient data extraction and management using AWS Athena. It allows users to execute complex queries, manage query , and handle datasets with ease. Whether you're dealing with procurement, sales returns, or custom data processing tasks, Athena Dumper simplifies the process by providing a streamlined interface for querying and exporting data.
+Athena Dumper is a Python-based tool designed for efficient data extraction and management using AWS Athena. It allows users to execute complex queries, manage query , and handle datasets with ease. Whether you're dealing with custom data processing tasks, Athena Dumper simplifies the process by providing a streamlined interface for querying and exporting data.
 
 ## Features
 
@@ -17,8 +17,8 @@ Athena Dumper is designed to be straightforward and user-friendly. With minimal 
 * Make sure you have installed `pip`
 * Run `pip install  -r requirement.txt`
 * Run the script.
-  `python3 main.py <scenario_file>`
-* Access the result in `/output` files
+  `python3 main.py -s <scenario_file>`
+* Access the result in `/output/scenario_name` files
 
 Users can make own scenario files.
 

@@ -1,4 +1,4 @@
-from lib.exec import execute_in_parallel
+from lib.exec import execute_and_write_in_parallel
 
 import importlib
 import argparse
@@ -19,19 +19,22 @@ def run_scenario(scenario_path):
 def main():
     
     parser = argparse.ArgumentParser(description='Run a scenario')
-    parser.add_argument('scenario', type=str, help='The scenario module to run')
+    parser.add_argument('-s', '--scenario', type=str, help='The scenario module to run')
+    parser.add_argument('-b', '--batch-size', type=int, help='The numbers of workers to process the queries')
+    parser.add_argument('-w', '--workers', type=int, help='The numbers of queries to processes in one pass')
 
     args = parser.parse_args()
     tasks = run_scenario(args.scenario)
     
-    results = execute_in_parallel(tasks=tasks)
+    results = execute_and_write_in_parallel(
+                tasks=tasks,
+                batch_size=args.batch_size, 
+                workers=args.workers,
+                prefix_dir=args.scenario
+            )
     # Retrieve the result from parallelism process
     for result in results:
         print(result)
 
 if __name__ == "__main__":
     main()
-    
-    
-        
-        

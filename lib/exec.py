@@ -1,13 +1,17 @@
+import pandas as pd
+import json
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from executor.athena import AthenaQueryExecutor
 from lib.io import write
 from lib.dataframe import convert_results_to_df
 
-def execute_with_dependant(query_generator,
+def execute_with_dependant(scenario,
                            dependant_query, 
                            dependant_columns, 
                            callback, 
-                           callback_column):
+                           callback_column,
+                           is_in_json_format = False):
     """
     Executes tasks with dependant, where the second query depends on the results of the first query. 
     waits for the query to complete, and writes the results to a CSV file using the write function.
@@ -16,9 +20,12 @@ def execute_with_dependant(query_generator,
     Args:
         query_generator: The generator query responsible to generate query
         dependant_query (str): The SQL query for parent table.
-        dependant_column (list): The columns in the parent result. used for the callback.
+        dependant_column (list): The columns in the parent result. this attributes will inject the values to callback column.
         callback (func): The function for execute SQL query for child table. this functions will be called after parent query executed
-        callback_column (str): The column in the child result.
+        callback_column (str): This column will reference for updating dictionary value in scenario. 
+            it will be useful for querying in child tables that have dependant to column of parent result. 
+        is_in_json_format (str, optional): This flag for determine the column of parent result whether in json format or not
+        
 
     Returns:
         DataFrame: The result of the child query.
@@ -39,10 +46,17 @@ def execute_with_dependant(query_generator,
     column_values = []
 
     for column in dependant_columns:
-        column_values.extend(parent_df[column].tolist())
+        if is_in_json_format:
+            # Extracting data from JSON in the additional data column
+            parent_df[column] = parent_df["additional_data"].apply(
+                lambda x: json.loads(x) if pd.notnull(x) else {}
+            )
+            column_values.extend(parent_df[column].apply(lambda x: x.get(column)).tolist())
+        else:
+            column_values.extend(parent_df[column].tolist())
             
     # Update callback columns in Query Generator before running the callback query
-    query_generator.set_dependant_attr(callback_column, column_values)
+    scenario.set_dependant_attr(callback_column, column_values)
         
     df = callback()
     
@@ -82,41 +96,37 @@ def execute(query, table_name=""):
     
     return df
 
-def execute_in_parallel(tasks, batch_size=3):
+def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir):
     """
     Executes multiple SQL tasks in parallel and write to local.
 
     Args:
         tasks (List[List]): A list of SQL query strings to be executed.
-        batch_size (int, optional): Number of workers handling task execution in parallel. Default is 3.
+        workers (int, optional): Number of workers handling task execution in parallel. Default is 3.
+        batch_size (int, optional): Number of query processed together in one pass. Default is 3.
         
     
     Returns:
         List: The results of the executed tasks.
     """
+    batch_size = batch_size or 3
+    workers = workers or 3
+    
     result_logs = []
     
     for i in range(0, len(tasks), batch_size):
-        # Create a batch of tasks with up to batch_size tasks
         batch = tasks[i:i+batch_size]
-        # Create a ThreadPoolExecutor to manage parallel execution of tasks
-        with ThreadPoolExecutor(batch_size) as executor:
-            # Submit each task to the executor and map futures to task IDs
+        with ThreadPoolExecutor(workers) as executor:
             future_to_tasks = {
                 executor.submit(task): task_id for task_id, task in batch
             }
-            # Process the results of completed tasks as they finish
             for future in as_completed(future_to_tasks):
-                # Retrieve the task ID associated with the completed future
                 task_id = future_to_tasks[future]
                 try:
-                    # Retrieve the result of the completed task
                     result = future.result()
                 except Exception as exc:
-                     # Log an error message if the task raised an exception
                     result_logs.append(f"Task with {task_id} generated an exception: {exc}")
                 else:
-                    # Log a success message and handle the result if the task completed successfully
                     result_logs.append(f"Task {task_id} executed successfully")
-                    write(result, task_id) # Implement the write function to handle results
+                    write(result, prefix_dir, task_id)
     return result_logs

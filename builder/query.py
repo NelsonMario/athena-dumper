@@ -25,21 +25,30 @@ class SimpleQueryBuilder:
 
     def where(self, condition, param):
         """
-        Add a condition to the WHERE clause of the query, including support for IN and NOT IN conditions.
+        Add a condition to the WHERE clause of the query, including support for IN, NOT IN, and LIKE conditions.
         
         Args:
             condition (str): The condition string, using placeholders for parameters (e.g., "column = %s").
                             For IN/NOT IN conditions, use the format "column IN (%s)" or "column NOT IN (%s)".
-            params (str or list): The parameters to be used in the condition. For IN/NOT IN, this should be a list of values.
+                            For LIKE conditions, use the format "column LIKE %s".
+            param (str or list): The parameters to be used in the condition. For IN/NOT IN, this should be a list of values.
+                                 For LIKE conditions, this should be a string or a list of strings.
         
         Returns:
             QueryBuilder: The current instance to allow method chaining.
         """
         if isinstance(param, list):
-            formatted_param  = "','".join([f"{str(value)}" for value in param])  # Convert each item to a string and wrap it in quotes
-            self.conditions.append((condition, formatted_param))
+            if "LIKE" in condition:
+                # Handle LIKE conditions with a list of values
+                like_clauses = [condition.replace('%s', f"'%{value}%'") for value in param]
+                self.conditions.append(' OR '.join(like_clauses))
+            else:
+                # Handle IN/NOT IN conditions with a list of values
+                in_clauses = "','".join([str(value) for value in param])
+                self.conditions.append(condition.replace('%s', f"'{in_clauses}'"))
         else:
-            self.conditions.append((condition, param))
+            self.conditions.append(condition.replace('%s', f"'{param}'"))
+        
         return self
 
     def build(self):
@@ -57,13 +66,9 @@ class SimpleQueryBuilder:
 
         # Construct the WHERE clause if conditions are provided
         where_clause = ""
-        (self.conditions)
+
         if self.conditions:
-            where_clauses = []
-            for condition, params in self.conditions:
-                condition = condition.replace("%s", f"'{params}'", 1)
-                where_clauses.append(condition)
-            where_clause = "WHERE " + " AND ".join(where_clauses)
+            where_clause = "WHERE " + " AND ".join(self.conditions)
 
         # Final query assembly
         query = f"SELECT {columns_clause} {from_clause} {where_clause} LIMIT 50;"

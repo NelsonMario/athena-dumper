@@ -1,41 +1,52 @@
 from threading import Lock
 
-class ThreadSafeWrapper:
-    def __init__(self, object):
-        """
-        Initialize the ThreadSafeWrapper with an object.
+class ThreadSafeWrapper():
+    """
+    A base class that provides thread safety for its derived classes.
+    
+    This class uses a threading.Lock to ensure that operations on shared resources
+    are thread-safe. Derived classes can use the _with_lock method to wrap their
+    methods and ensure that only one thread can execute the method at a time.
+    """
 
-        Args:
-            obj (object): The object to be wrapped and synchronized.
+    def __init__(self):
         """
-        self.object = object
-        self.lock = Lock()
+        Initializes the ThreadSafeBase class by creating a threading.Lock instance.
+        This lock will be used to synchronize access to shared resources.
+        """
+        self._lock = Lock()
+
+    def _with_lock(self, func):
+        """
+        A decorator method that ensures the wrapped function is executed with
+        the threading lock held, providing thread safety for the operation.
         
-    def __getattr__(self, name):
-        """
-        Intercept attribute access and wrap method calls with thread safety.
-
         Args:
-            name (str): The name of the attribute being accessed.
+            func: The function to be wrapped and protected by the lock.
         
         Returns:
-            function: A wrapped function that synchronizes access to the method.
+            A wrapper function that acquires the lock before calling the original
+            function and releases the lock afterward.
         """
-        def wrapped(*args, **kwargs):
-            # Acquire the lock to ensure thread-safe access to the method
-            with self.lock:
-                method = getattr(self.object, name) # Get the method from the wrapped object
-                return method(*args, **kwargs) # Call the method with arguments
-        return wrapped
+        def wrapper(*args, **kwargs):
+            with self._lock:
+                return func(*args, **kwargs)
+        return wrapper
+    
+    @property
+    def set_dependant_attr(self):
+        """
+        Provides a thread-safe method to update attributes.
         
-    def set_dependant_attr(self, callback_column_name, callback_column_value):
+        Returns:
+            A callable that accepts key-value pairs to update attributes in a
+            thread-safe manner. The actual attributes dictionary should be defined
+            in derived classes.
         """
-        Set an attribute on the wrapped object in a thread-safe manner.
-
-        Args:
-            callback_column_name (str): The name of the attribute to set.
-            callback_column_value (any): The value to set for the attribute.
-        """
-        with self.lock:
-            # Acquire the lock to ensure thread-safe access to the method
-            self.object.attributes[callback_column_name] = callback_column_value
+        @self._with_lock
+        def method(key, value):
+            if hasattr(self, 'attributes') and key in self.attributes:
+                self.attributes[key] = value
+            else:
+                raise KeyError(f"Key {key} not found in attributes.")
+        return method

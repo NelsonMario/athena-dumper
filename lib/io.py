@@ -11,21 +11,25 @@ def save_results_to_csv(dataframe, output_file):
     dataframe.to_csv(output_file, index=False)
     print(f"Results saved to {output_file}")
     
-def write(dataframe, output_file='results.csv'):
+def write(dataframe, prefix_dir="", file_name='results.csv'):
     """
-    Writes the query results to a CSV file if the query is successful.
+    Writes the DataFrame to a CSV file. Creates an output directory if it doesn't exist.
     
     Args:
-        dataframe (Dataframe): The pandas DataFrame to be saved.
-        output_file (str, optional): The name of the output CSV file.
+        dataframe (pd.DataFrame): The pandas DataFrame to be saved.
+        prefix_dir (str, optional): The prefix directory to be included in the output path.
+        file_name (str, optional): The name of the output CSV file.
     """
-        
-    # Create the output directory if it doesn't exist
-    os.makedirs("output", exist_ok=True)
+    # Define the base directory for the output
+    base_dir = "output"
     
-    # Save the results to a CSV file in the output directory
-    save_results_to_csv(
-        dataframe=dataframe, 
-        output_file=f"output/{output_file}.csv"
-    )
+    # Construct the file path
+    file_path = os.path.join(base_dir, prefix_dir, file_name)
+    
+    # Create the output directory if it doesn't exist
+    os.makedirs(os.path.join(base_dir, prefix_dir), exist_ok=True)
+    
+    # Save the results to a CSV file
+    dataframe.to_csv(f"{file_path}.csv", index=False)
+    print(f"[SUCCEEDED] {file_path} has been saved")
         

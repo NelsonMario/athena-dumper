@@ -24,13 +24,19 @@ class AthenaQueryExecutor:
         Args:
             query (str): query for querying in athena
         """
+        
         response = self.athena_client.start_query_execution(
             QueryString=query,
             WorkGroup=self.work_group
         )
         self.query_execution_id = response['QueryExecutionId']
-        print(f"[Exec] Query started with execution ID: {self.query_execution_id}")
-        print(f"[Exec] Query : {query}")
+        
+        log = {
+            "QueryID": self.query_execution_id,
+            "Query": query
+        }
+        
+        print(f"[STARTED] Starting execution : {log}")
 
     def wait_for_query_to_complete(self, max_attempt = 5, initial_delay = 1):
         """
@@ -49,7 +55,12 @@ class AthenaQueryExecutor:
                 QueryExecutionId=self.query_execution_id
             )
             status = response['QueryExecution']['Status']['State']
-            print(f"[Wait] [{self.query_execution_id}] Query status : {status}")
+            
+            log = {
+                "QueryID": self.query_execution_id,
+            }
+            
+            print(f"[{status}] Waiting for Query Execution : {log}")
             
             if status in [Status.SUCCEEDED.name, Status.FAILED.name, Status.CANCELLED.name]:
                 self.query_status = status == Status.SUCCEEDED.name
