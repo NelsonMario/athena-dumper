@@ -25,7 +25,7 @@ def main():
     parser.add_argument('-w', '--workers', type=int, help='The numbers of queries to processes in one pass')
     parser.add_argument('-m', '--move', 
                             type=str, 
-                            help='The target directory path follows up by prefix file name (optional). Automatically move the output file to certain directory based on filename',
+                            help='The target directory path follows up by prefix file name (optional). move the output file to certain directory based on filename automatically.',
                             nargs='*',
                         )
 
