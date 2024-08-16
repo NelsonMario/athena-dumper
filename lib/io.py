@@ -17,16 +17,13 @@ def write(dataframe, prefix_dir="", file_name='results.csv'):
     Writes the DataFrame to a CSV file. Creates an output directory if it doesn't exist.
     
     Args:
-        dataframe (pd.DataFrame): The pandas DataFrame to be saved.
+        dataframe (DataFrame): The pandas DataFrame to be saved.
         prefix_dir (str, optional): The prefix directory to be included in the output path.
         file_name (str, optional): The name of the output CSV file.
     """
     # Define the base directory for the output
     base_dir = "output"
     
-    print(base_dir) 
-    print(prefix_dir)
-    print(file_name)
     # Construct the file path
     file_path = os.path.join(base_dir, prefix_dir, file_name)
     
