@@ -51,7 +51,7 @@ def execute_with_dependant(scenario,
             parent_df[column] = parent_df["additional_data"].apply(
                 lambda x: json.loads(x) if pd.notnull(x) else {}
             )
-            column_values.extend(parent_df[column].apply(lambda x: x.get(column)).tolist())
+            column_values.extend(parent_df[column].apply(lambda x: str(x.get(column))).tolist())
         else:
             column_values.extend(parent_df[column].tolist())
             
