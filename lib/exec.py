@@ -96,7 +96,7 @@ def execute(query, table_name=""):
     
     return df
 
-def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir):
+def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir, prefix_filename):
     """
     Executes multiple SQL tasks in parallel and write to local.
 
@@ -128,5 +128,5 @@ def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir):
                     result_logs.append(f"Task with {task_id} generated an exception: {exc}")
                 else:
                     result_logs.append(f"Task {task_id} executed successfully")
-                    write(result, prefix_dir, task_id)
+                    write(result, prefix_dir, f"{prefix_filename}_{task_id}" if prefix_filename != None else f"{task_id}")
     return result_logs
