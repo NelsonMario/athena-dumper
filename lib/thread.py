@@ -1,4 +1,10 @@
 from threading import Lock
+import logging
+from lib.log import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 class ThreadSafeWrapper():
     """
@@ -48,5 +54,6 @@ class ThreadSafeWrapper():
             if hasattr(self, 'attributes') and key in self.attributes:
                 self.attributes[key] = value
             else:
-                raise KeyError(f"Key {key} not found in attributes.")
+                logger(f"Key {key} not found in attributes.", KeyError)
+                raise KeyError
         return method

@@ -1,6 +1,7 @@
 import time
 from enum import Enum
 import boto3
+import logging
 
 class Status(Enum):
     SUCCEEDED = 1
@@ -36,7 +37,7 @@ class AthenaQueryExecutor:
             "Query": query
         }
         
-        print(f"[STARTED] Starting execution : {log}")
+        logging.info(f"[STARTED] Starting execution : {log}")
 
     def wait_for_query_to_complete(self, max_attempt = 5, initial_delay = 1):
         """
@@ -60,7 +61,7 @@ class AthenaQueryExecutor:
                 "QueryID": self.query_execution_id,
             }
             
-            print(f"[{status}] Waiting for Query Execution : {log}")
+            logging.info(f"[{status}] Waiting for Query Execution : {log}")
             
             if status in [Status.SUCCEEDED.name, Status.FAILED.name, Status.CANCELLED.name]:
                 self.query_status = status == Status.SUCCEEDED.name

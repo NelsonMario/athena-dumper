@@ -1,5 +1,11 @@
 import os
 import shutil
+import logging
+from lib.log import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 def save_results_to_csv(dataframe, output_file):
     """
@@ -10,7 +16,7 @@ def save_results_to_csv(dataframe, output_file):
         output_file (str): The path where the CSV file will be saved.
     """
     dataframe.to_csv(output_file, index=False)
-    print(f"Results saved to {output_file}")
+    logger.info(f"Results saved to {output_file}")
     
 def write(dataframe, prefix_dir="", file_name='results.csv'):
     """
@@ -32,7 +38,7 @@ def write(dataframe, prefix_dir="", file_name='results.csv'):
     
     # Save the results to a CSV file
     dataframe.to_csv(f"{file_path}.csv", index=False)
-    print(f"[SUCCEEDED] {file_path} has been saved")
+    logger.info(f"[SUCCEEDED] {file_path} has been saved")
     
 def list_all_input(base_dir):
     """

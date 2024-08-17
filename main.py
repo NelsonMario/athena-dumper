@@ -4,6 +4,12 @@ from lib.io import move_files_recursive
 import importlib
 import argparse
 import os
+import logging
+from lib.log import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 def run_scenario(scenario_path):
     try:
@@ -14,10 +20,14 @@ def run_scenario(scenario_path):
             scenario_instance = scenario_class()
             return scenario_instance.run()
         else:
-            raise NotImplementedError(f"No 'Scenario' class found in {scenario_module}")
-    except ModuleNotFoundError:
-        raise NotImplementedError(f"Module {scenario_module} not found")
-
+            raise NotImplementedError()
+    except NotImplementedError as e:
+        logger.exception(f"No 'Scenario' class found in {scenario_module}", e)
+        raise e
+    except ModuleNotFoundError as e:
+        logger.exception(f"Module {scenario_module} not found", e)
+        raise e
+    
 def main():
     parser = argparse.ArgumentParser(description='Run a scenario')
     parser.add_argument('-s', '--scenario', type=str, help='The scenario module to run')
@@ -43,7 +53,8 @@ def main():
             targeted_path, prefix_filename = args.move
         else:
             # Handle the case where neither or more than two arguments are provided
-            raise ValueError("Invalid number of arguments for --move. Expected 1 or 2 arguments.")
+            logger.exception("Invalid number of arguments for --move. Expected 1 or 2 arguments.", ValueError)
+            raise ValueError
         
     if os.path.exists(prefix_filename):
         raise ValueError("Invalid prefix name. prefix name should not in directory path structure")
@@ -57,7 +68,7 @@ def main():
             )
     # Retrieve the result from parallelism process
     for result in results:
-        print(result)
+        logger.info(result)
         
     if(targeted_path != None):
         move_files_recursive(f"./output/{args.scenario}", targeted_path, prefix_filename)

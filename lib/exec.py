@@ -3,7 +3,12 @@ from query.conditions import in_with_regex
 from executor.athena import AthenaQueryExecutor
 from lib.io import write
 from lib.dataframe import convert_results_to_df
+import logging
+from lib.log import setup_logging
 
+setup_logging()
+
+logger = logging.getLogger(__name__)
 class ChainedQuery:
     def __init__(self, query, dependant_field=None):
         """
@@ -40,7 +45,8 @@ def chained_execute(queries):
     for i, chained_query in enumerate(queries):
         # Ensure each item in queries is an instance of ChainedQuery
         if not isinstance(chained_query, ChainedQuery):
-            raise TypeError("Each item in queries should be an instance of ChainedQuery")
+            logger.exception("Each item in queries should be an instance of ChainedQuery", TypeError)
+            raise TypeError
         
         # Get the current query from the ChainedQuery object
         curr_query = chained_query.query

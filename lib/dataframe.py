@@ -1,4 +1,5 @@
 import pandas as pd
+import logging
 
 def convert_results_to_df(rows):
     """
@@ -11,7 +12,7 @@ def convert_results_to_df(rows):
         DataFrame: A pandas DataFrame with the query results.
     """
     if not rows:
-        print("No data to write.")
+        logging.info("No data to write.")
         return
 
     # Extract headers from the first row
