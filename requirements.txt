@@ -1,11 +1,61 @@
-boto3==1.26.160
-botocore==1.29.160
+appnope==0.1.4
+asttokens==2.4.1
+awscli==1.29.10
+awsudo @ git+https://github.com/makethunder/awsudo.git@d5800bc4a9785d179c678605d0ae5bf4e28f5205
+boto==2.49.0
+boto3==1.34.160
+botocore==1.34.160
+certifi==2022.12.7
+cffi @ file:///private/tmp/cffi-20231014-5454-1xfyd4s/cffi-1.16.0
+colorama==0.4.4
+comm==0.2.2
+cramjam==2.7.0
+cryptography @ file:///private/tmp/python-cryptography-20231024-6215-1s33lvq/cryptography-41.0.5
+debugpy==1.8.2
+decorator==5.1.1
+distlib==0.3.6
+docutils==0.16
+executing==2.0.1
+fastparquet==2023.7.0
+filelock==3.10.0
+fsspec==2023.6.0
+ipykernel==6.29.5
+ipython==8.26.0
+jedi==0.19.1
 jmespath==1.0.1
-numpy==2.0.1
-pandas==2.2.2
+jupyter_client==8.6.2
+jupyter_core==5.7.2
+matplotlib-inline==0.1.7
+nest-asyncio==1.6.0
+numpy==1.25.2
+packaging==23.1
+pandas==2.0.3
+parso==0.8.4
+pexpect==4.9.0
+pipenv==2023.3.20
+platformdirs==3.1.1
+prompt_toolkit==3.0.47
+psutil==6.0.0
+ptyprocess==0.7.0
+pure-eval==0.2.2
+pyasn1==0.5.0
+pycparser @ file:///private/tmp/pycparser-20231013-5559-1dtd22y/pycparser-2.21
+Pygments @ file:///private/tmp/pygments-20231008-5407-1u4v80i/Pygments-2.16.1
+PyPika==0.48.9
 python-dateutil==2.8.2
-pytz==2024.1
-s3transfer==0.6.1
+pytz==2023.3
+PyYAML @ file:///private/tmp/pyyaml-20231018-5457-utbrds/PyYAML-6.0.1
+pyzmq==26.0.3
+retrying==1.3.4
+rsa==4.7.2
+s3transfer==0.10.2
 six==1.16.0
-tzdata==2024.1
+stack-data==0.6.3
+tornado==6.4.1
+traitlets==5.14.3
+typing_extensions @ file:///private/tmp/python-typing-extensions-20231008-5404-1unbk9z/typing_extensions-4.8.0
+tzdata==2023.3
 urllib3==1.26.16
+virtualenv==20.21.0
+virtualenv-clone==0.5.7
+wcwidth==0.2.13
