@@ -1,5 +1,10 @@
 import pandas as pd
 import logging
+from lib.log import setup_logging
+
+setup_logging()
+
+logger = logging.getLogger(__name__)
 
 def convert_results_to_df(rows):
     """
@@ -12,7 +17,7 @@ def convert_results_to_df(rows):
         DataFrame: A pandas DataFrame with the query results.
     """
     if not rows:
-        logging.info("No data to write.")
+        logger.info("No data to write.")
         return
 
     # Extract headers from the first row
