@@ -33,7 +33,7 @@ def main():
     tasks = run_scenario(args.scenario)
     
     targeted_path = None
-    prefix_filename = None
+    prefix_filename = ""
     
     if(args.move):
         if len(args.move) == 1:

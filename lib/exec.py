@@ -1,72 +1,71 @@
-import pandas as pd
-import json
-
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from query.conditions import in_with_regex
 from executor.athena import AthenaQueryExecutor
 from lib.io import write
 from lib.dataframe import convert_results_to_df
 
-def execute_with_dependant(scenario,
-                           dependant_query, 
-                           dependant_columns, 
-                           callback, 
-                           callback_column,
-                           is_in_json_format = False):
+class ChainedQuery:
+    def __init__(self, query, dependant_field=None):
+        """
+        Initializes a ChainedQuery instance.
+
+        This class represents a query that may depend on the results of previous queries.
+        It allows for chaining multiple queries where each subsequent query can use results
+        from the previous ones.
+
+        Args:
+            query (Query): The Pypika query to be executed.
+            dependant_field (Field, optional): A field from the query results that the
+                                                next query will depend on. Default is None.
+        """
+        self.query = query
+        self.dependant_field = dependant_field
+
+def chained_execute(queries):
     """
-    Executes tasks with dependant, where the second query depends on the results of the first query. 
-    waits for the query to complete, and writes the results to a CSV file using the write function.
-    After the operation is complete, it deletes the executor instance.
-    
+    Executes a sequence of ChainedQuery objects, passing results as dynamic values to the next query.
+
+    This function runs a series of queries where each query can depend on the results of the previous one.
+    It handles the execution and chaining of queries based on their dependencies.
+
     Args:
-        query_generator: The generator query responsible to generate query
-        dependant_query (str): The SQL query for parent table.
-        dependant_column (list): The columns in the parent result. this attributes will inject the values to callback column.
-        callback (func): The function for execute SQL query for child table. this functions will be called after parent query executed
-        callback_column (str): This column will reference for updating dictionary value in scenario. 
-            it will be useful for querying in child tables that have dependant to column of parent result. 
-        is_in_json_format (str, optional): This flag for determine the column of parent result whether in json format or not
-        
+        queries (list of ChainedQuery): A list of ChainedQuery objects representing the sequence of queries.
 
     Returns:
-        DataFrame: The result of the child query.
+        DataFrame: The result of the final query in the sequence.
     """
+    df = None
+    result = None
     
-    executor = AthenaQueryExecutor()
-    
-    # Running the dependant query
-    executor.execute_query(dependant_query)
-    
-    # Wait for the query to complete
-    executor.wait_for_query_to_complete()
-    
-    # Write the results to the specified output file
-    parent_result = executor.get_query_results()
-    parent_df = convert_results_to_df(parent_result)
-    
-    column_values = []
-
-    for column in dependant_columns:
-        if is_in_json_format:
-            # Extracting data from JSON in the additional data column
-            parent_df[column] = parent_df["additional_data"].apply(
-                lambda x: json.loads(x) if pd.notnull(x) else {}
-            )
-            column_values.extend(parent_df[column].apply(lambda x: str(x.get(column))).tolist())
-        else:
-            column_values.extend(parent_df[column].tolist())
-            
-    # Update callback columns in Query Generator before running the callback query
-    scenario.set_dependant_attr(callback_column, column_values)
+    for i, chained_query in enumerate(queries):
+        # Ensure each item in queries is an instance of ChainedQuery
+        if not isinstance(chained_query, ChainedQuery):
+            raise TypeError("Each item in queries should be an instance of ChainedQuery")
         
-    df = callback()
-    
-    # Clean up the executor instance
-    del executor
-    
+        # Get the current query from the ChainedQuery object
+        curr_query = chained_query.query
+        
+        # If there are previous results and they are not empty
+        if df is not None and not df.empty:
+            # Extract values from the 'pass' column of the previous result
+            values = df['pass'].tolist()
+            # Update the current query to filter based on these values
+            curr_query = curr_query.where(in_with_regex(chained_query.dependant_field, values))
+        
+        # Execute the current query
+        result = execute(curr_query)
+        
+        # If this is not the last query in the sequence, update df to only include the 'pass' column
+        if i != len(queries) - 1:
+            df = result[["pass"]]
+        else:
+            # For the last query, keep the full result
+            df = result
+            
     return df
-   
+        
 
-def execute(query, table_name=""):
+def execute(query):
     """
     Executes an SQL query and writes the result to a specified CSV file.
 
@@ -76,11 +75,12 @@ def execute(query, table_name=""):
 
     Args:
         query (str): The SQL query string to be executed.
-        table_name (str, optional): The name of the dataframe file.
     """
+    query = query.limit(50).get_sql(quote_char=None)
+    
     # Initialize the AthenaQueryExecutor
     executor = AthenaQueryExecutor()
-    
+
     # Execute the query
     executor.execute_query(query)
     
@@ -89,7 +89,6 @@ def execute(query, table_name=""):
     
     # Get query results and convert to dataframe
     df = convert_results_to_df(executor.get_query_results())
-    df.Name = table_name
     
     # Clean up the executor instance
     del executor
@@ -128,5 +127,5 @@ def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir, prefix
                     result_logs.append(f"Task with {task_id} generated an exception: {exc}")
                 else:
                     result_logs.append(f"Task {task_id} executed successfully")
-                    write(result, prefix_dir, f"{prefix_filename}_{task_id}" if prefix_filename != None else f"{task_id}")
+                    write(result, prefix_dir, f"{prefix_filename}_{task_id}" if prefix_filename != "" else f"{task_id}")
     return result_logs

@@ -23,8 +23,8 @@ Athena Dumper is designed to be straightforward and user-friendly. With minimal 
 Users can make own scenario files.
 
 * Go to `scenarios` directory
-* Make a new file with `Scenario` classname, User can make their own query generator by injecting `SimpleQueryBuilder`.
-* In the `Scenario` class using `execute` or `execute_with_dependant` to run query from query generator
+* Make a new file with `Scenario` classname, All explanations are commented.
+* In the `Scenario` class using `execute` or `chained_execute` to run query from query generator
 
 ## Prerequisites
 

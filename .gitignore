@@ -166,3 +166,7 @@ output/
 *_scenario.py
 !scenario.py
 foo_scenario.py
+
+# schema
+schema/*
+!database_bar/
