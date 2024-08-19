@@ -82,13 +82,13 @@ def traverse_file(base_dir, target_dir, dir_map):
             
     return dir_map
 
-def move_files_recursive(base_dir, target_dir, prefix_filename):
+def export_files_recursive(base_dir, target_dir, prefix_filename):
     """
-    Move files from the base directory to directories within target_dir based on the file names.
+    Export files from the base directory to directories within target_dir based on the file names.
     
     Args:
-    - base_dir (str): The base directory where the files to be moved are located.
-    - target_dir (str): The directory where files should be moved based on matching directory names.
+    - base_dir (str): The base directory where the files to be export are located.
+    - target_dir (str): The directory where files should be export based on matching directory names.
     - prefix_filename (str): The prefix to be removed from the file names before matching with directories.
     """
     files = list_all_input(base_dir)  # Get the list of all files and directories in the base directory
@@ -101,6 +101,6 @@ def move_files_recursive(base_dir, target_dir, prefix_filename):
         # Check if the directory name (after prefix and extension removal) exists in the directory map
         if file_name_without_prefix_and_ext in dir_map:
             src_file_path = os.path.join(base_dir, file)  # Construct the source file path
-            # Move the file to the matching directory
+            # Export the file to the matching directory
             shutil.copy(src_file_path, dir_map[file_name_without_prefix_and_ext])
         
