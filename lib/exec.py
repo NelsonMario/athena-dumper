@@ -53,21 +53,19 @@ def chained_execute(queries):
         
         # If there are previous results and they are not empty
         if df is not None and not df.empty:
-            # Extract values from the 'pass' column of the previous result
-            values = df['pass'].tolist()
+            values = []
+            # Iterate over each column in the DataFrame
+            for column in df.columns:
+                # Extend the values with values from the current column
+                # Convert column values to a list and add them to values
+                values.extend(df[column].to_list())
+                
             # Update the current query to filter based on these values
             curr_query = curr_query.where(in_with_regex(chained_query.dependant_field, values))
         
         # Execute the current query
-        result = execute(curr_query)
+        df = execute(curr_query)
         
-        # If this is not the last query in the sequence, update df to only include the 'pass' column
-        if i != len(queries) - 1:
-            df = result[["pass"]]
-        else:
-            # For the last query, keep the full result
-            df = result
-            
     return df
         
 
@@ -130,8 +128,8 @@ def execute_and_write_in_parallel(tasks, batch_size, workers, prefix_dir, prefix
                 try:
                     result = future.result()
                 except Exception as exc:
-                    result_logs.append(f"Task with {task_id} generated an exception: {exc}")
+                    result_logs.append(f"[FAILED] Task-{task_id} generated an exception: {exc}")
                 else:
-                    result_logs.append(f"Task {task_id} executed successfully")
+                    result_logs.append(f"[SUCCEEDED] Task-{task_id} executed successfully")
                     write(result, prefix_dir, f"{prefix_filename}_{task_id}" if prefix_filename != "" else f"{task_id}")
     return result_logs

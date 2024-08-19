@@ -102,5 +102,5 @@ def move_files_recursive(base_dir, target_dir, prefix_filename):
         if file_name_without_prefix_and_ext in dir_map:
             src_file_path = os.path.join(base_dir, file)  # Construct the source file path
             # Move the file to the matching directory
-            shutil.move(src_file_path, dir_map[file_name_without_prefix_and_ext])
+            shutil.copy(src_file_path, dir_map[file_name_without_prefix_and_ext])
         
