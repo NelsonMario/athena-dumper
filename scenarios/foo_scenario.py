@@ -5,6 +5,7 @@ from lib.task import Task
 from schema.database_bar import tables as bar  
 from query.conditions import in_with_regex  
 from query.fields import field  
+from pypika import Query
 
 # Define the Scenario class that inherits from ThreadSafeWrapper and IScenario
 class Scenario(ThreadSafeWrapper, IScenario):
