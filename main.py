@@ -35,7 +35,7 @@ def main():
                             help='The target directory path follows up by prefix file name (optional). export the output file to certain directory based on filename automatically.',
                             nargs='*',
                         )
-    parser.add_argument('--log-level', type=str, default="DEBUG", help="Set the logging level (e.g., DEBUG, INFO, QUERY, ERROR)")
+    parser.add_argument('--log-level', type=str, default="INFO", help="Set the logging level (e.g., DEBUG, INFO, QUERY, ERROR)")
 
     args = parser.parse_args()
     tasks = run_scenario(args.scenario)
