@@ -31,7 +31,6 @@ def run_scenario(scenario_path):
 def main():
     parser = argparse.ArgumentParser(description='Run a scenario')
     parser.add_argument('-s', '--scenario', type=str, help='The scenario module to run')
-    parser.add_argument('-b', '--batch-size', type=int, help='The numbers of workers to process the queries')
     parser.add_argument('-w', '--workers', type=int, help='The numbers of queries to processes in one pass')
     parser.add_argument('-m', '--move', 
                             type=str, 
@@ -61,7 +60,6 @@ def main():
             
     results = execute_and_write_in_parallel(
                 tasks=tasks,
-                batch_size=args.batch_size, 
                 workers=args.workers,
                 prefix_dir=args.scenario,
                 prefix_filename=prefix_filename

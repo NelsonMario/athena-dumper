@@ -1,6 +1,7 @@
 from scenarios.scenario import IScenario  
 from lib.thread import ThreadSafeWrapper  
 from lib.exec import execute, chained_execute, ChainedQuery  
+from lib.task import Task
 from schema.database_bar import tables as bar  
 from query.conditions import in_with_regex  
 from query.fields import field  
@@ -11,23 +12,19 @@ class Scenario(ThreadSafeWrapper, IScenario):
     def create_tasks(self):
         # Define tasks as a list of tuples with task names and their corresponding queries
         tasks = [
-            ["groups", self.default_query_map["groups"]],
-            ["users", self.default_query_map["users"]],
+            Task("groups", self.default_query_map["groups"]),
+            Task("users", self.default_query_map["users"]),
         ]
         
         return tasks
 
     # Method to run the scenario
     def run(self):
-        # Define a thread-safe function using the decorator to ensure thread safety
-        @self._with_lock
-        def thread_safe_run():
-            # Set query parameter for 'group_id'
-            self.query_param["group_id"] = ["1"]
-            # Create tasks using the defined method
-            return self.create_tasks()
+        # Set query parameter for 'group_id'
+        self.query_param["group_id"] = ["1"]
+        # Create tasks using the defined method
+        return self.create_tasks()
         
-        return thread_safe_run()
     
     # Constructor for the Scenario class
     def __init__(self):

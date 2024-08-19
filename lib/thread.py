@@ -6,7 +6,7 @@ setup_logging()
 
 logger = logging.getLogger(__name__)
 
-class ThreadSafeWrapper():
+class ThreadSafeWrapper:
     """
     A base class that provides thread safety for its derived classes.
     
@@ -38,22 +38,3 @@ class ThreadSafeWrapper():
             with self._lock:
                 return func(*args, **kwargs)
         return wrapper
-    
-    @property
-    def set_dependant_attr(self):
-        """
-        Provides a thread-safe method to update attributes.
-        
-        Returns:
-            A callable that accepts key-value pairs to update attributes in a
-            thread-safe manner. The actual attributes dictionary should be defined
-            in derived classes.
-        """
-        @self._with_lock
-        def method(key, value):
-            if hasattr(self, 'attributes') and key in self.attributes:
-                self.attributes[key] = value
-            else:
-                logger(f"Key {key} not found in attributes.", KeyError)
-                raise KeyError
-        return method
