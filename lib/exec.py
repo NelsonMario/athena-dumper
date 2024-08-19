@@ -107,13 +107,12 @@ def execute_and_write_in_parallel(tasks, workers, prefix_dir, prefix_filename):
 
     Args:
         tasks (List[List]): A list of SQL query strings to be executed.
-        workers (int, optional): Number of workers handling task execution in parallel. Default is 3.
+        workers (int, optional): Number of workers handling task execution in parallel. Default is 6.
         
-    
     Returns:
         List: The results of the executed tasks.
     """
-    workers = workers or 3
+    workers = workers or 6
     
     # Initialize an empty list to store the logs of task results.
     result_logs = []
