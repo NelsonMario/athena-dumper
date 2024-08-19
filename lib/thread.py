@@ -1,8 +1,5 @@
 from threading import Lock
 import logging
-from lib.log import setup_logging
-
-setup_logging()
 
 logger = logging.getLogger(__name__)
 

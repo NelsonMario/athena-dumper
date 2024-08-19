@@ -2,11 +2,9 @@ import time
 from enum import Enum
 import boto3
 import logging
-from lib.log import setup_logging
-
-setup_logging()
 
 logger = logging.getLogger(__name__)
+
 class Status(Enum):
     SUCCEEDED = 1
     FAILED = 0
@@ -29,6 +27,7 @@ class AthenaQueryExecutor:
         Args:
             query (str): query for querying in athena
         """
+        logger.query(f"[PREPARING] Query: {query}")
         
         response = self.athena_client.start_query_execution(
             QueryString=query,

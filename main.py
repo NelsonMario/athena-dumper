@@ -1,13 +1,11 @@
-from lib.exec import execute_and_write_in_parallel
+
 from lib.io import export_files_recursive
-
-import importlib
-import argparse
-import os
-import logging
 from lib.log import setup_logging
-
-setup_logging()
+from lib.parallel import run
+import argparse
+import importlib
+import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -37,12 +35,15 @@ def main():
                             help='The target directory path follows up by prefix file name (optional). export the output file to certain directory based on filename automatically.',
                             nargs='*',
                         )
+    parser.add_argument('--log-level', type=str, default="DEBUG", help="Set the logging level (e.g., DEBUG, INFO, QUERY, ERROR)")
 
     args = parser.parse_args()
     tasks = run_scenario(args.scenario)
     
     targeted_path = None
     prefix_filename = ""
+    
+    setup_logging(args.log_level)
     
     if(args.export):
         if len(args.export) == 1:
@@ -58,7 +59,7 @@ def main():
     if os.path.exists(prefix_filename):
         raise ValueError("Invalid prefix name. prefix name should not in directory path structure")
             
-    results = execute_and_write_in_parallel(
+    results = run(
                 tasks=tasks,
                 workers=args.workers,
                 prefix_dir=args.scenario,

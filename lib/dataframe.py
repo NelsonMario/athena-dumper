@@ -1,8 +1,5 @@
-import pandas as pd
 import logging
-from lib.log import setup_logging
-
-setup_logging()
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,3 @@
-from pypika import functions as fn
-
 def in_with_regex(field, values):
     """
     Creates a condition that matches a field against multiple values using regex-like patterns.

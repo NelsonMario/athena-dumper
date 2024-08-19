@@ -1,4 +1,7 @@
 from lib.thread import ThreadSafeWrapper
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Task(ThreadSafeWrapper):
     def __init__(self, id, callable_func):
