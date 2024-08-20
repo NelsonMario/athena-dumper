@@ -44,7 +44,7 @@ class AthenaQueryExecutor:
 
     def wait_for_query_to_complete(self, max_attempt = 10, initial_delay = 1):
         """
-        Checking the status of query execution by 5 seconds. 
+        Checking the status of query execution by fibbonacci sequence. 
         The response status will be consists of SUCCEEDED, FAILED, and CANCELLED
         
         Args
