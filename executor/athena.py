@@ -42,7 +42,7 @@ class AthenaQueryExecutor:
         
         logger.info(f"[STARTED] Starting execution : {log}")
 
-    def wait_for_query_to_complete(self, max_attempt = 5, initial_delay = 1):
+    def wait_for_query_to_complete(self, max_attempt = 10, initial_delay = 1):
         """
         Checking the status of query execution by 5 seconds. 
         The response status will be consists of SUCCEEDED, FAILED, and CANCELLED
